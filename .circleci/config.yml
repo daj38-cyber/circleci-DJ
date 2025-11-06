@@ -1,8 +1,17 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/ruby:2.4.1
-    steps:
-      - checkout
-      - run:  echo "A first hello"
+version: 2.1
+
+orbs:
+  aws-ecr: circleci/aws-ecr@9.0
+  aws-cli: circleci/aws-cli@5.1
+
+workflows:
+  build-and-push:
+    jobs:
+      - aws-ecr/build_and_push_image:
+          auth:
+            - aws-cli/setup:
+                role_arn: arn:aws:iam::123456789012
+          repo: 'my-sample-repo'
+          tag: '${CIRCLE_SHA1}'
+          region: 'us-west-2'
+          create_repo: true
